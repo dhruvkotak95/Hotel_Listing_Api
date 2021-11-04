@@ -1,7 +1,9 @@
+using Hotel_Listing_Api.DataModel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,8 +28,9 @@ namespace Hotel_Listing_Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
-            services.AddControllers();
+            services.AddDbContext<DatabaseContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("SqlConnectionString"))
+            );
             services.AddCors(o =>
             {
                 o.AddPolicy("AllowAllRequests", builder =>
@@ -37,6 +40,7 @@ namespace Hotel_Listing_Api
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Hotel_Listing_Api", Version = "v1" });
             });
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
