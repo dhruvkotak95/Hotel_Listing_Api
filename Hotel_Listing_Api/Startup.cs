@@ -1,5 +1,7 @@
 using Hotel_Listing_Api.Configurations;
 using Hotel_Listing_Api.DataModel;
+using Hotel_Listing_Api.IRepository;
+using Hotel_Listing_Api.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -34,11 +36,15 @@ namespace Hotel_Listing_Api
 
             services.AddAutoMapper(typeof(MapperInitializer));
 
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Hotel_Listing_Api", Version = "v1" });
             });
-            services.AddControllers();
+
+            services.AddControllers().AddNewtonsoftJson(j =>
+            j.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
