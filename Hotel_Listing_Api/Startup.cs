@@ -1,5 +1,6 @@
 using Hotel_Listing_Api.Configurations;
 using Hotel_Listing_Api.DataModel;
+using Hotel_Listing_Api.IdentityConfigurations;
 using Hotel_Listing_Api.IRepository;
 using Hotel_Listing_Api.Repository;
 using Microsoft.AspNetCore.Builder;
@@ -27,6 +28,9 @@ namespace Hotel_Listing_Api
             services.AddDbContext<DatabaseContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("SqlConnectionString"))
             );
+
+            services.AddAuthentication();
+            services.ConfigureIdentity(); // set up identity and identity roles
 
             services.AddCors(o =>
             {

@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace Hotel_Listing_Api.DataModel
 {
-    public class DatabaseContext : DbContext
+    public class DatabaseContext : IdentityDbContext
     {
         public DatabaseContext(DbContextOptions options) : base(options)
         {
@@ -11,9 +12,12 @@ namespace Hotel_Listing_Api.DataModel
 
         public DbSet<Country> countries { get; set; }
         public DbSet<Hotel> hotels { get; set; }
+        public DbSet<ApiUser> apiUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder); // from IdentityDbContext
+
             modelBuilder.Entity<Country>().HasData(
                 new Country
                 {
