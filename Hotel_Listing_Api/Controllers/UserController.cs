@@ -54,6 +54,10 @@ namespace Hotel_Listing_Api.Controllers
                     }
                     return BadRequest(ModelState);
                 }
+
+                // add roles after successfull registration
+                await _userManager.AddToRolesAsync(user, userDTO.Roles);
+
                 return Accepted();
             }
             catch (Exception ex)
