@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using System;
 using Microsoft.AspNetCore.Http;
+using Hotel_Listing_Api.JwtServices;
 
 namespace Hotel_Listing_Api.Controllers
 {
@@ -18,14 +19,16 @@ namespace Hotel_Listing_Api.Controllers
         // private readonly SignInManager<ApiUser> _signInManager;
         private readonly ILogger<UserController> _logger;
         private readonly IMapper _mapper;
+        private readonly IJwtAuthManager _jwtAuthManager;
 
         // SignInManager<ApiUser> signInManager,
-        public UserController(UserManager<ApiUser> userManager, ILogger<UserController> logger, IMapper mapper)
+        public UserController(UserManager<ApiUser> userManager, ILogger<UserController> logger, IMapper mapper, IJwtAuthManager jwtAuthManager)
         {
             _userManager = userManager;
             // _signInManager = signInManager;
             _logger = logger;
             _mapper = mapper;
+            _jwtAuthManager = jwtAuthManager;
         }
 
         [HttpPost]
@@ -67,30 +70,29 @@ namespace Hotel_Listing_Api.Controllers
             }
         }
 
-        //[HttpPost]
-        //[Route("Login")]
-        //public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
-        //{
-        //    _logger.LogInformation($"Login method trying to accesss by {loginDTO.Email}");
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(loginDTO);
-        //    }
+        [HttpPost]
+        [Route("Login")]
+        public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
+        {
+            _logger.LogInformation($"Login method trying to accesss by {loginDTO.Email}");
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(loginDTO);
+            }
 
-        //    try
-        //    {
-        //        var result = await _signInManager.PasswordSignInAsync(loginDTO.Email, loginDTO.Password, false, false);
-        //        if (!result.Succeeded)
-        //        {
-        //            return Unauthorized(loginDTO);
-        //        }
-        //        return Accepted();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, $"Internal server error in {nameof(Login)}");
-        //        return Problem($"Internal server error caught in catch block in {nameof(Login)}", statusCode: 500);
-        //    }
-        //}
+            try
+            {
+                if (!await _jwtAuthManager.ValidateUser(loginDTO))
+                {
+                    return Unauthorized();
+                }
+                return Accepted(new { Token = await _jwtAuthManager.CreateToken() });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Internal server error in {nameof(Login)}");
+                return Problem($"Internal server error caught in catch block in {nameof(Login)}", statusCode: 500);
+            }
+        }
     }
 }

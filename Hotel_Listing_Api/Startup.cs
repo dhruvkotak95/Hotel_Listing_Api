@@ -2,6 +2,7 @@ using Hotel_Listing_Api.Configurations;
 using Hotel_Listing_Api.DataModel;
 using Hotel_Listing_Api.IdentityConfigurations;
 using Hotel_Listing_Api.IRepository;
+using Hotel_Listing_Api.JwtServices;
 using Hotel_Listing_Api.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,6 +32,7 @@ namespace Hotel_Listing_Api
 
             services.AddAuthentication();
             services.ConfigureIdentity(); // set up identity and identity roles
+            services.ConfigureJwt(Configuration); // set up jwt configuration from service extension
 
             services.AddCors(o =>
             {
@@ -41,6 +43,7 @@ namespace Hotel_Listing_Api
             services.AddAutoMapper(typeof(MapperInitializer));
 
             services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IJwtAuthManager, JwtAuthManager>();
 
             services.AddSwaggerGen(c =>
             {
@@ -67,6 +70,7 @@ namespace Hotel_Listing_Api
 
             app.UseRouting();
 
+            app.UseAuthentication(); // this line is required as we call [Authorize] annotation before method
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

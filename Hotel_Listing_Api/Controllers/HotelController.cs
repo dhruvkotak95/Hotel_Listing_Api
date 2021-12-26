@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Hotel_Listing_Api.DTO_Models;
 using Hotel_Listing_Api.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Hotel_Listing_Api.Controllers
@@ -45,10 +45,12 @@ namespace Hotel_Listing_Api.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet]
         [Route("GetHotelById")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetHotelById(int hotelId)
         {
